@@ -31,11 +31,11 @@ app.post("/api/jarvis", async (req, res) => {
 
     res.json({ respuesta: response.output_text });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error conectando con la IA." });
+    console.error("OpenAI error:", error);
+    res.status(500).json({ error: error?.message || "Error conectando con la IA." });
   }
 });
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`🤖 JARVIS activo en el puerto ${port}`);
 });
