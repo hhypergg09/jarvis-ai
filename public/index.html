@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#070b12;color:#eaf6ff;height:100vh;display:flex;align-items:center;justify-content:center}
+.app{width:min(1000px,96vw);height:min(760px,94vh);background:#0c121c;border:1px solid #26364a;border-radius:22px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 70px #0008}
+header{padding:18px 22px;border-bottom:1px solid #26364a;display:flex;align-items:center;gap:14px}
+.logo{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#102c3d;border:1px solid #28b8ff;font-size:24px}
+h1{margin:0;font-size:20px}.status{font-size:12px;color:#6ee7b7;margin-top:4px}
+#chat{flex:1;overflow:auto;padding:24px;display:flex;flex-direction:column;gap:14px}
+.msg{max-width:78%;padding:13px 16px;border-radius:16px;line-height:1.45;white-space:pre-wrap}
+.user{align-self:flex-end;background:#164766}.jarvis{align-self:flex-start;background:#151e2a;border:1px solid #27384c}
+.welcome{opacity:.75;text-align:center;margin:auto}
+form{display:flex;gap:10px;padding:16px;border-top:1px solid #26364a}
+input{flex:1;background:#080d15;border:1px solid #30445c;color:white;border-radius:14px;padding:14px;font-size:15px;outline:none}
+input:focus{border-color:#28b8ff}
+button{border:0;border-radius:14px;padding:0 20px;background:#1597d1;color:white;font-weight:bold;cursor:pointer}
+button:hover{filter:brightness(1.12)}button:disabled{opacity:.5;cursor:wait}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">🤖</div><div><h1>JARVIS</h1><div class="status">● Sistema conectado</div></div></header>
+<div id="chat"><div class="welcome">Escribe algo y JARVIS responderá con IA.</div></div>
+<form id="form"><input id="input" autocomplete="off" placeholder="Habla con JARVIS..." /><button id="send">Enviar</button></form>
+</div>
+<script>
+const chat=document.getElementById("chat"),form=document.getElementById("form"),input=document.getElementById("input"),send=document.getElementById("send");
+function addMessage(text,type){const welcome=document.querySelector(".welcome");if(welcome)welcome.remove();const div=document.createElement("div");div.className="msg "+type;div.textContent=text;chat.appendChild(div);chat.scrollTop=chat.scrollHeight;}
+form.addEventListener("submit",async e=>{e.preventDefault();const mensaje=input.value.trim();if(!mensaje)return;addMessage(mensaje,"user");input.value="";send.disabled=true;addMessage("Procesando...","jarvis");const loading=chat.lastElementChild;try{const r=await fetch("/api/jarvis",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mensaje})});const data=await r.json();loading.remove();if(!r.ok)throw new Error(data.error||"Error desconocido");addMessage(data.respuesta||"No recibí respuesta.","jarvis");}catch(err){loading.remove();addMessage("⚠️ "+err.message,"jarvis");}finally{send.disabled=false;input.focus();}});
+input.focus();
+</script>
+</body>
+</html>
